@@ -2,20 +2,94 @@
 <html>
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Space Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .game-shell {
+      width: min(100vw, 1040px);
+      padding: 12px;
+      box-sizing: border-box;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      border: 1px solid #d3d3d3;
+      background: #000;
+      touch-action: none;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .controls button {
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #2a7fff;
+      color: #fff;
+      font-size: 16px;
+      touch-action: none;
+    }
+
+    .controls button:active {
+      transform: scale(0.98);
+    }
+
+    .controls .wide {
+      grid-column: span 3;
+      background: #16a34a;
+    }
+
+    .controls .secondary {
+      background: #6b7280;
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .controls .wide {
+        grid-column: span 2;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="game-shell">
+    <canvas id="myCanvas" width="1024" height="768">
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
 
-<p>Image to use:</p>
-<p>Canvas:</p>
+    <div class="controls" aria-label="Game controls">
+      <button type="button" data-action="left">◀ Left</button>
+      <button type="button" data-action="up">▲ Up</button>
+      <button type="button" data-action="right">▶ Right</button>
+      <button type="button" data-action="down">▼ Down</button>
+      <button type="button" data-action="fire" class="secondary">Fire</button>
+      <button type="button" data-action="start" class="wide">Start / Enter</button>
+    </div>
+  </div>
 
-<canvas id="myCanvas" width="1024" height="768" style="border:1px solid #d3d3d3;">
-Your browser does not support the HTML5 canvas tag.</canvas>
-
-<script src="app.js">
-
-</script>
-
+  <script src="app.js"></script>
 </body>
 </html>
 

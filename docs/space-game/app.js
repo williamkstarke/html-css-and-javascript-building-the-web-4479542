@@ -219,6 +219,12 @@ const hero = new Hero(0, 0);
 const WIDTH = 1024;
 const HEIGHT = 768;
 let gameObjects = [];
+const touchControls = {
+  left: false,
+  right: false,
+  up: false,
+  down: false,
+};
 let laserRedImg;
 let laserRedShot;
 let laserGreenShot;
@@ -296,6 +302,76 @@ window.addEventListener("keydown", (e) => {
       break;
   }
 });
+
+function handleTouchAction(action, isActive) {
+  switch (action) {
+    case "left":
+      touchControls.left = isActive;
+      if (isActive) {
+        touchControls.right = false;
+        eventEmitter.emit(Messages.HERO_SPEED_LEFT);
+      } else {
+        eventEmitter.emit(Messages.HERO_SPEED_ZERO);
+      }
+      break;
+    case "right":
+      touchControls.right = isActive;
+      if (isActive) {
+        touchControls.left = false;
+        eventEmitter.emit(Messages.HERO_SPEED_RIGHT);
+      } else {
+        eventEmitter.emit(Messages.HERO_SPEED_ZERO);
+      }
+      break;
+    case "up":
+      touchControls.up = isActive;
+      if (isActive) {
+        eventEmitter.emit(Messages.KEY_EVENT_UP);
+      }
+      break;
+    case "down":
+      touchControls.down = isActive;
+      if (isActive) {
+        eventEmitter.emit(Messages.KEY_EVENT_DOWN);
+      }
+      break;
+    case "fire":
+      if (isActive) {
+        eventEmitter.emit(Messages.HERO_FIRE);
+      }
+      break;
+    case "start":
+      if (isActive) {
+        eventEmitter.emit(Messages.GAME_START);
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+function attachTouchControls() {
+  document.querySelectorAll("[data-action]").forEach((button) => {
+    const action = button.getAttribute("data-action");
+
+    const start = (evt) => {
+      evt.preventDefault();
+      handleTouchAction(action, true);
+    };
+
+    const end = (evt) => {
+      evt.preventDefault();
+      handleTouchAction(action, false);
+    };
+
+    button.addEventListener("pointerdown", start);
+    button.addEventListener("pointerup", end);
+    button.addEventListener("pointerleave", end);
+    button.addEventListener("pointercancel", end);
+    button.addEventListener("touchend", end);
+    button.addEventListener("touchcancel", end);
+  });
+}
 
 // TODO make message driven
 window.addEventListener("keyup", (evt) => {
@@ -447,12 +523,14 @@ window.onload = async () => {
   laserGreenShot = await loadTexture("spaceArt/png/laserGreenShot.png");
   lifeImg = await loadTexture("spaceArt/png/life.png");
 
+  attachTouchControls();
+
   game.ready = true;
   game.end = true;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  displayMessage("Press [Enter] to start the game Captain Pew Pew", "blue");
+  displayMessage("Tap Start or press [Enter] to begin Captain Pew Pew", "blue");
 
   // CHECK  draw 5 * 5 monsters
   // CHECK move monsters down 1 step per 0.5 second
