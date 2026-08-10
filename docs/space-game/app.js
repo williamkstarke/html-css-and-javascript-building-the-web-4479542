@@ -224,7 +224,6 @@ const touchControls = {
   right: false,
   firing: false,
 };
-let movementPad;
 let movementActive = false;
 let movementPointerId = null;
 let laserRedImg;
@@ -348,8 +347,6 @@ function handleTouchAction(action, isActive) {
 }
 
 function attachTouchControls() {
-  movementPad = document.getElementById("movementPad");
-
   document.querySelectorAll("[data-action]").forEach((button) => {
     const action = button.getAttribute("data-action");
 
