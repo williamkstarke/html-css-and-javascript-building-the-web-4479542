@@ -222,8 +222,6 @@ let gameObjects = [];
 const touchControls = {
   left: false,
   right: false,
-  up: false,
-  down: false,
   firing: false,
 };
 let movementPad;
@@ -311,30 +309,24 @@ window.addEventListener("keydown", (e) => {
 function resetMovementState() {
   touchControls.left = false;
   touchControls.right = false;
-  touchControls.up = false;
-  touchControls.down = false;
   eventEmitter.emit(Messages.HERO_SPEED_ZERO);
   if (stickKnob) {
     stickKnob.style.transform = "translate(0px, 0px)";
   }
 }
 
-function updateMovementFromJoystick(dx, dy) {
+function updateMovementFromJoystick(dx) {
   const deadZone = 10;
   const maxDistance = 34;
   const clampedX = Math.max(-maxDistance, Math.min(maxDistance, dx));
-  const clampedY = Math.max(-maxDistance, Math.min(maxDistance, dy));
   const normalizedX = Math.abs(clampedX) > deadZone ? clampedX : 0;
-  const normalizedY = Math.abs(clampedY) > deadZone ? clampedY : 0;
 
   if (stickKnob) {
-    stickKnob.style.transform = `translate(${clampedX}px, ${clampedY}px)`;
+    stickKnob.style.transform = `translate(${clampedX}px, 0px)`;
   }
 
   touchControls.left = normalizedX < -deadZone;
   touchControls.right = normalizedX > deadZone;
-  touchControls.up = normalizedY < -deadZone;
-  touchControls.down = normalizedY > deadZone;
 
   if (touchControls.left) {
     eventEmitter.emit(Messages.HERO_SPEED_LEFT);
@@ -342,13 +334,6 @@ function updateMovementFromJoystick(dx, dy) {
     eventEmitter.emit(Messages.HERO_SPEED_RIGHT);
   } else {
     eventEmitter.emit(Messages.HERO_SPEED_ZERO);
-  }
-
-  if (touchControls.up) {
-    eventEmitter.emit(Messages.KEY_EVENT_UP);
-  }
-  if (touchControls.down) {
-    eventEmitter.emit(Messages.KEY_EVENT_DOWN);
   }
 }
 
@@ -381,10 +366,8 @@ function attachTouchControls() {
     movementPad.setPointerCapture(evt.pointerId);
     const rect = movementPad.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
     const dx = evt.clientX - centerX;
-    const dy = evt.clientY - centerY;
-    updateMovementFromJoystick(dx, dy);
+    updateMovementFromJoystick(dx);
   };
 
   const moveMovement = (evt) => {
@@ -394,10 +377,8 @@ function attachTouchControls() {
     evt.preventDefault();
     const rect = movementPad.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
     const dx = evt.clientX - centerX;
-    const dy = evt.clientY - centerY;
-    updateMovementFromJoystick(dx, dy);
+    updateMovementFromJoystick(dx);
   };
 
   const endMovement = (evt) => {

@@ -86,6 +86,25 @@
       color: #d1d5db;
     }
 
+    .stick-pad .left-arrow,
+    .stick-pad .right-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 34px;
+      color: #f9fafb;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .stick-pad .left-arrow {
+      left: 24px;
+    }
+
+    .stick-pad .right-arrow {
+      right: 24px;
+    }
+
     .action-pad {
       display: flex;
       flex-direction: column;
@@ -142,7 +161,9 @@
 
     <div class="controls" aria-label="Game controls">
       <div class="stick-pad" id="movementPad" aria-label="Movement pad">
+        <div class="left-arrow">◀</div>
         <div class="stick-knob" id="stickKnob"></div>
+        <div class="right-arrow">▶</div>
         <div class="label">Move</div>
       </div>
       <div class="action-pad" aria-label="Action pad">
