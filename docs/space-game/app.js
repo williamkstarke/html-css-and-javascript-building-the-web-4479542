@@ -206,8 +206,7 @@ class Game {
       hero.x = hero.x < WIDTH ? hero.x + 10 : hero.x;
     });
     eventEmitter.on(Messages.GAME_START, () => {
-      if (game.ready && game.end) {
-        // assets loaded
+      if (game.ready) {
         runGame();
       }
     });
@@ -239,6 +238,8 @@ let lifeImg;
 let monsterImg;
 
 let coolDown = 0;
+let gameLoopId = null;
+let coolingTimerId = null;
 
 const game = new Game();
 
@@ -397,11 +398,17 @@ window.addEventListener("keyup", (evt) => {
 });
 
 function cooling() {
+  if (coolingTimerId !== null) {
+    clearInterval(coolingTimerId);
+  }
+
   coolDown = 500;
-  let id = setInterval(() => {
+  coolingTimerId = setInterval(() => {
     coolDown -= 100;
-    if (coolDown === 0) {
-      clearInterval(id);
+    if (coolDown <= 0) {
+      coolDown = 0;
+      clearInterval(coolingTimerId);
+      coolingTimerId = null;
     }
   }, 100);
 }
@@ -493,16 +500,38 @@ function checkGameState(gameLoopId) {
   gameObjects = gameObjects.filter((go) => !go.dead);
 }
 
-function runGame() {
+function resetGameState() {
+  if (gameLoopId !== null) {
+    clearInterval(gameLoopId);
+    gameLoopId = null;
+  }
+
+  if (coolingTimerId !== null) {
+    clearInterval(coolingTimerId);
+    coolingTimerId = null;
+  }
+
+  touchControls.left = false;
+  touchControls.right = false;
+  touchControls.firing = false;
+  coolDown = 0;
   gameObjects = [];
   game.life = 3;
   game.points = 0;
   game.end = false;
+  hero.dead = false;
+  hero.speed = { x: 0, y: 0 };
+  hero.img = heroImg;
+  hero.x = (canvas.width - hero.width) / 2;
+  hero.y = (canvas.height / 4) * 3;
+}
 
+function runGame() {
+  resetGameState();
   createMonsters(monsterImg);
   createHero(heroImg);
 
-  let gameLoopId = setInterval(() => {
+  gameLoopId = setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
