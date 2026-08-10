@@ -225,9 +225,8 @@ const touchControls = {
   firing: false,
 };
 let movementPad;
-let stickKnob;
 let movementActive = false;
-let joystickPointerId = null;
+let movementPointerId = null;
 let laserRedImg;
 let laserRedShot;
 let laserGreenShot;
@@ -310,23 +309,16 @@ function resetMovementState() {
   touchControls.left = false;
   touchControls.right = false;
   eventEmitter.emit(Messages.HERO_SPEED_ZERO);
-  if (stickKnob) {
-    stickKnob.style.transform = "translate(0px, 0px)";
-  }
 }
 
-function updateMovementFromJoystick(dx) {
-  const deadZone = 10;
-  const maxDistance = 34;
-  const clampedX = Math.max(-maxDistance, Math.min(maxDistance, dx));
-  const normalizedX = Math.abs(clampedX) > deadZone ? clampedX : 0;
-
-  if (stickKnob) {
-    stickKnob.style.transform = `translate(${clampedX}px, 0px)`;
+function updateMovementFromButtons(action, isActive) {
+  if (action === "left") {
+    touchControls.left = isActive;
+    touchControls.right = false;
+  } else if (action === "right") {
+    touchControls.right = isActive;
+    touchControls.left = false;
   }
-
-  touchControls.left = normalizedX < -deadZone;
-  touchControls.right = normalizedX > deadZone;
 
   if (touchControls.left) {
     eventEmitter.emit(Messages.HERO_SPEED_LEFT);
@@ -357,56 +349,26 @@ function handleTouchAction(action, isActive) {
 
 function attachTouchControls() {
   movementPad = document.getElementById("movementPad");
-  stickKnob = document.getElementById("stickKnob");
-
-  const startMovement = (evt) => {
-    evt.preventDefault();
-    movementActive = true;
-    joystickPointerId = evt.pointerId;
-    movementPad.setPointerCapture(evt.pointerId);
-    const rect = movementPad.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const dx = evt.clientX - centerX;
-    updateMovementFromJoystick(dx);
-  };
-
-  const moveMovement = (evt) => {
-    if (!movementActive || evt.pointerId !== joystickPointerId) {
-      return;
-    }
-    evt.preventDefault();
-    const rect = movementPad.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const dx = evt.clientX - centerX;
-    updateMovementFromJoystick(dx);
-  };
-
-  const endMovement = (evt) => {
-    if (evt.pointerId !== joystickPointerId && joystickPointerId !== null) {
-      return;
-    }
-    evt.preventDefault();
-    movementActive = false;
-    joystickPointerId = null;
-    resetMovementState();
-  };
-
-  movementPad.addEventListener("pointerdown", startMovement);
-  movementPad.addEventListener("pointermove", moveMovement);
-  movementPad.addEventListener("pointerup", endMovement);
-  movementPad.addEventListener("pointercancel", endMovement);
 
   document.querySelectorAll("[data-action]").forEach((button) => {
     const action = button.getAttribute("data-action");
 
     const start = (evt) => {
       evt.preventDefault();
-      handleTouchAction(action, true);
+      if (action === "left" || action === "right") {
+        updateMovementFromButtons(action, true);
+      } else {
+        handleTouchAction(action, true);
+      }
     };
 
     const end = (evt) => {
       evt.preventDefault();
-      handleTouchAction(action, false);
+      if (action === "left" || action === "right") {
+        updateMovementFromButtons(action, false);
+      } else {
+        handleTouchAction(action, false);
+      }
     };
 
     button.addEventListener("pointerdown", start);

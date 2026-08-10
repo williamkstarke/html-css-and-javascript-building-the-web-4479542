@@ -40,7 +40,7 @@
       align-items: stretch;
     }
 
-    .stick-pad,
+    .movement-pad,
     .action-pad {
       flex: 1;
       min-height: 160px;
@@ -53,56 +53,27 @@
       user-select: none;
     }
 
-    .stick-pad {
-      position: relative;
-      background: radial-gradient(circle at center, #374151 0%, #111827 70%);
+    .movement-pad {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      gap: 12px;
+      padding: 12px;
+      align-items: stretch;
     }
 
-    .stick-pad .stick-knob {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #60a5fa, #2563eb);
-      border: 3px solid #dbeafe;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-      position: absolute;
-      left: calc(50% - 32px);
-      top: calc(50% - 32px);
-      transition: transform 0.08s ease;
+    .movement-pad button {
+      flex: 1;
+      border: 0;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+      color: #fff;
+      font-size: 28px;
+      font-weight: 800;
+      touch-action: none;
+      box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.25);
     }
 
-    .stick-pad .label {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #d1d5db;
-    }
-
-    .stick-pad .left-arrow,
-    .stick-pad .right-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 34px;
-      color: #f9fafb;
-      font-weight: 700;
-      pointer-events: none;
-    }
-
-    .stick-pad .left-arrow {
-      left: 24px;
-    }
-
-    .stick-pad .right-arrow {
-      right: 24px;
+    .movement-pad button:active {
+      transform: scale(0.98);
     }
 
     .action-pad {
@@ -160,11 +131,9 @@
     </canvas>
 
     <div class="controls" aria-label="Game controls">
-      <div class="stick-pad" id="movementPad" aria-label="Movement pad">
-        <div class="left-arrow">◀</div>
-        <div class="stick-knob" id="stickKnob"></div>
-        <div class="right-arrow">▶</div>
-        <div class="label">Move</div>
+      <div class="movement-pad" id="movementPad" aria-label="Movement pad">
+        <button type="button" data-action="left">◀</button>
+        <button type="button" data-action="right">▶</button>
       </div>
       <div class="action-pad" aria-label="Action pad">
         <button type="button" class="fire" data-action="fire">Fire</button>
