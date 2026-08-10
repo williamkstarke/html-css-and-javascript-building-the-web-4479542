@@ -183,14 +183,18 @@ class Game {
       Messages.COLLISION_MONSTER_HERO,
       (_, { monster: m, id }) => {
         game.life--;
+        hero.img = heroImgDamaged;
+        m.dead = true;
+        gameObjects.push(new Explosion(m.x, m.y, laserRedShot));
+
         if (game.life === 0) {
           hero.dead = true;
           eventEmitter.emit(Messages.GAME_END_LOSS, id);
           gameObjects.push(new Explosion(hero.x, hero.y, laserGreenShot));
+          return;
         }
-        hero.img = heroImgDamaged;
-        m.dead = true;
-        gameObjects.push(new Explosion(m.x, m.y, laserRedShot));
+
+        resetHeroAndMonsterWave();
       }
     );
     eventEmitter.on(Messages.KEY_EVENT_UP, () => {
@@ -459,6 +463,17 @@ function createHero(heroImg) {
   hero.y = (canvas.height / 4) * 3;
   hero.x = canvas.width / 2;
   gameObjects.push(hero);
+}
+
+function resetHeroAndMonsterWave() {
+  gameObjects = gameObjects.filter((go) => go.type === "Hero");
+  hero.dead = false;
+  hero.speed = { x: 0, y: 0 };
+  hero.img = heroImgDamaged;
+  hero.x = canvas.width / 2;
+  hero.y = (canvas.height / 4) * 3;
+  gameObjects.push(hero);
+  createMonsters(monsterImg);
 }
 
 function checkGameState(gameLoopId) {
